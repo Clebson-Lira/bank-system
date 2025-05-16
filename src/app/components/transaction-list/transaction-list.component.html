@@ -1,0 +1,47 @@
+<div class="transaction-list-container">
+  <h2>Extrato de Movimentações</h2>
+
+  <form [formGroup]="filterForm" (ngSubmit)="onFilterSubmit()" class="filter-form">
+    <label>
+      Data Inicial:
+      <input type="date" formControlName="startDate" />
+    </label>
+
+    <label>
+      Data Final:
+      <input type="date" formControlName="endDate" />
+    </label>
+
+    <button type="submit">Filtrar</button>
+    <button type="button" (click)="clearFilter()">Limpar</button>
+  </form>
+
+  <div *ngIf="loading">Carregando transações...</div>
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+  <table *ngIf="!loading && filteredTransactions.length > 0" class="transaction-table">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Tipo</th>
+        <th>Valor (R$)</th>
+        <th>Descrição</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let tx of filteredTransactions">
+        <td>{{ tx.date | date:'short' }}</td>
+        <td>{{ tx.type | titlecase }}</td>
+        <td [class.positive]="tx.type === 'deposit'" [class.negative]="tx.type === 'withdraw'">{{ tx.amount | currency:'BRL':'symbol':'1.2-2' }}</td>
+        <td>{{ tx.description || '-' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!loading && filteredTransactions.length === 0">
+    Nenhuma movimentação encontrada para o período selecionado.
+  </div>
+   <div class=" btn button actions">
+    <button type="button" [routerLink]="['/dashboard']">Voltar</button>
+  </div>
+</div>

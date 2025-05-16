@@ -1,0 +1,45 @@
+<div class="settings-container">
+  <h2>Configurações de Perfil</h2>
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+    <div class="profile-image">
+      <img *ngIf="currentImageUrl; else noImage" [src]="currentImageUrl" alt="Foto do usuário" />
+      <ng-template #noImage>
+        <div class="placeholder-image">Sem foto</div>
+      </ng-template>
+      <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+    </div>
+
+    <div class="form-group">
+      <label>Nome Completo</label>
+      <input formControlName="fullName" type="text" />
+    </div>
+
+    <div class="form-group">
+      <label>Email</label>
+      <input formControlName="email" type="email" />
+    </div>
+
+    <hr />
+
+    <div class="form-group">
+      <label>Senha Atual</label>
+      <input formControlName="currentPassword" type="password" />
+    </div>
+
+    <div class="form-group">
+      <label>Nova Senha</label>
+      <input formControlName="newPassword" type="password" (input)="checkPasswordMatch()" />
+    </div>
+
+    <div class="form-group">
+      <label>Confirmar Nova Senha</label>
+      <input formControlName="confirmNewPassword" type="password" (input)="checkPasswordMatch()" />
+      <div *ngIf="passwordMismatch" class="error">As senhas não coincidem.</div>
+    </div>
+
+    <div class="actions">
+      <button type="submit" [disabled]="profileForm.invalid || passwordMismatch">Salvar</button>
+      <button type="button" (click)="cancel()">Cancelar</button>
+    </div>
+  </form>
+</div>

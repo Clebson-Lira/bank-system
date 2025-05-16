@@ -1,0 +1,57 @@
+<div class="register-container">
+  <h2>Cadastro</h2>
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="fullName">Nome Completo</label>
+      <input id="fullName" formControlName="fullName" type="text" />
+      <div *ngIf="registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched">
+        Nome é obrigatório
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input id="email" formControlName="email" type="email" />
+      <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+        Email inválido ou obrigatório
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="cpf">CPF</label>
+      <input id="cpf" formControlName="cpf" type="text" maxlength="11" />
+      <div *ngIf="registerForm.get('cpf')?.invalid && registerForm.get('cpf')?.touched">
+        CPF deve conter 11 dígitos numéricos
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="birthDate">Data de Nascimento</label>
+      <input id="birthDate" formControlName="birthDate" type="date" />
+      <div *ngIf="registerForm.get('birthDate')?.invalid && registerForm.get('birthDate')?.touched">
+        Data de nascimento é obrigatória
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Senha</label>
+      <input id="password" formControlName="password" type="password" />
+      <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+        Senha é obrigatória
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="confirmPassword">Confirmar Senha</label>
+      <input id="confirmPassword" formControlName="confirmPassword" type="password" />
+      <div *ngIf="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched">
+        Confirmação de senha é obrigatória
+      </div>
+      <div *ngIf="passwordMismatch">
+        As senhas não coincidem
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="registerForm.invalid || passwordMismatch">Cadastrar</button>
+  </form>
+</div>

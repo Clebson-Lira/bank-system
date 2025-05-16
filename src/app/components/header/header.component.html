@@ -1,0 +1,13 @@
+<header class="app-header">
+  <div class="user-info">
+    <img *ngIf="userPhotoUrl; else noPhoto" [src]="userPhotoUrl" alt="Foto do usuário" />
+    <ng-template #noPhoto>
+      <div class="no-photo">U</div>
+    </ng-template>
+    <span class="user-name">{{ userName }}</span>
+    <a routerLink="/settings" class="settings-link" title="Editar perfil">
+      ⚙️
+    </a>
+  </div>
+  <button (click)="logout()" title="Sair">Logout</button>
+</header>
