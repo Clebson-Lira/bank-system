@@ -16,7 +16,7 @@ export interface Transaction {
   providedIn: 'root'
 })
 export class TransactionService {
-  private baseUrl = 'http://localhost:3000/api/transactions'; // Ajuste para sua API
+  private baseUrl = 'http://localhost:3000/account'; // Ajuste para sua API
 
   constructor(private http: HttpClient) {}
 
@@ -38,4 +38,9 @@ export class TransactionService {
     if (endDate) params.endDate = endDate;
     return this.http.get<Transaction[]>(this.baseUrl, { params });
   }
+
+  getAccount(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/me`);
+  }
+
 }

@@ -35,13 +35,24 @@ export class DashboardComponent implements OnInit {
     this.loadRecentMovements();
   }
 
-   loadAccountInfo() {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    this.account.fullName = user.fullName || '';
-    this.account.accountNumber = user.accountNumber || '';
-    this.account.agency = user.agency || '1234';
-    this.account.balance = user.balance || 0;
-  }
+    loadAccountInfo() {
+      this.transactionService.getAccount().subscribe({
+        next: (accountData) => {
+          const user = JSON.parse(localStorage.getItem('user') || '{}');
+          this.account.fullName = user.fullName || '';
+          this.account.accountNumber = accountData.accountNumber || '';
+          this.account.agency = accountData.agency || '1234';
+          this.account.balance = accountData.balance || 0;
+        },
+        error: () => {
+          const user = JSON.parse(localStorage.getItem('user') || '{}');
+          this.account.fullName = user.fullName || '';
+          this.account.accountNumber = user.accountNumber || '';
+          this.account.agency = user.agency || '1234';
+          this.account.balance = user.balance || 0;
+        }
+      });
+    }
 
   loadRecentMovements() {
     this.transactionService.getTransactions().subscribe(transactions => {

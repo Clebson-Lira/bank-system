@@ -24,12 +24,17 @@ export class LoginComponent {
   onSubmit() {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
-      this.authService.fakeLogin(email, password).subscribe(
-  () => this.router.navigate(['/dashboard']),
-  (err) => console.error('Login falhou', err)
-);
+      this.authService.login(email, password).subscribe(
+        () => this.router.navigate(['/dashboard']),
+        (err) => console.error('Login falhou', err)
+      );
     }
   }
+
+//    this.authService.fakeLogin(email, password).subscribe(
+//   () => this.router.navigate(['/dashboard']),
+//   (err) => console.error('Login falhou', err)
+// );
 
 //  this.authService.login(email, password).subscribe(
 //         () => this.router.navigate(['/dashboard']),

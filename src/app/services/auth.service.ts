@@ -5,12 +5,15 @@ import { Observable, of, tap } from 'rxjs';
 interface LoginResponse {
   token: string;
   user: {
-    id: string;
+    id: number;
     fullName: string;
     email: string;
+    accountNumber: string;
+    agency: string;
     photoUrl?: string;
   };
 }
+
 
 interface RegisterData {
   fullName: string;
@@ -24,31 +27,10 @@ interface RegisterData {
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:3000/api/auth'; // Ajuste para sua API
+  private baseUrl = 'http://localhost:3000/auth'; // Ajuste para sua API
 
   constructor(private http: HttpClient) {}
 
-   // Método de login fake para testes
-  fakeLogin(email: string, password: string): Observable<LoginResponse> {
-    // Defina aqui o usuário e senha de teste
-    if (email === 'teste@teste.com' && password === '123456') {
-      const response: LoginResponse = {
-        token: 'fake-token',
-        user: {
-          id: '1',
-          fullName: 'Usuário Teste',
-          email: 'teste@teste.com'
-        }
-      };
-      // Salva no localStorage como o login real
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      return of(response);
-    } else {
-      // Simula erro de login
-      throw new Error('Usuário ou senha inválidos');
-    }
-  }
 
   login(email: string, password: string): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, { email, password })
