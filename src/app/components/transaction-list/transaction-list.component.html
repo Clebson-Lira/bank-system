@@ -28,11 +28,19 @@
         <th>Descrição</th>
       </tr>
     </thead>
-    <tbody>
+        <tbody>
       <tr *ngFor="let tx of filteredTransactions">
-        <td>{{ tx.date | date:'short' }}</td>
+        <td>{{ tx.createdAt | date:'short' }}</td>
         <td>{{ tx.type | titlecase }}</td>
-        <td [class.positive]="tx.type === 'deposit'" [class.negative]="tx.type === 'withdraw'">{{ tx.amount | currency:'BRL':'symbol':'1.2-2' }}</td>
+        <td
+          [ngClass]="{
+            'positive': tx.type === 'deposit',
+            'negative': tx.type === 'withdrawal',
+            'transfer': tx.type === 'transfer'
+          }"
+        >
+          {{ tx.amount | currency:'BRL':'symbol':'1.2-2' }}
+        </td>
         <td>{{ tx.description || '-' }}</td>
       </tr>
     </tbody>

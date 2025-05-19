@@ -1,6 +1,6 @@
 <div class="transaction-form-container">
   <h2>
-    {{ transactionType === 'deposit' ? 'Depósito' : transactionType === 'withdraw' ? 'Saque' : 'Transferência' }}
+    {{ transactionType === 'deposit' ? 'Depósito' : transactionType === 'withdrawal' ? 'Saque' : 'Transferência' }}
   </h2>
 
   <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">

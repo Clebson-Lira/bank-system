@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { TransactionService } from '../../services/transaction.service';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { AccountService } from '../../services/account.service';
 
 @Component({
   selector: 'app-transaction-form',
@@ -12,14 +13,14 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
   styleUrls: ['./transaction-form.component.scss']
 })
 export class TransactionFormComponent implements OnInit {
-  transactionType: 'deposit' | 'withdraw' | 'transfer' = 'deposit';
+  transactionType: 'deposit' | 'withdrawal' | 'transfer' = 'deposit';
 
   transactionForm: FormGroup;
   submitting = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
 
-  constructor(private fb: FormBuilder, private transactionService: TransactionService, private route: ActivatedRoute) {
+  constructor(private fb: FormBuilder, private transactionService: TransactionService, private route: ActivatedRoute, private accountService: AccountService) {
     this.transactionForm = this.fb.group({
       amount: ['', [Validators.required, Validators.min(0.01)]],
       destinationAgency: [''],
@@ -31,7 +32,7 @@ export class TransactionFormComponent implements OnInit {
     // Ouça as mudanças do parâmetro da rota
     this.route.paramMap.subscribe(params => {
       const type = params.get('type');
-      if (type === 'deposit' || type === 'withdraw' || type === 'transfer') {
+      if (type === 'deposit' || type === 'withdrawal' || type === 'transfer') {
         this.transactionType = type;
       } else {
         this.transactionType = 'deposit';
@@ -60,7 +61,7 @@ export class TransactionFormComponent implements OnInit {
 
     switch(this.transactionType) {
       case 'deposit':
-        this.transactionService.deposit(amount).subscribe({
+        this.accountService.deposit(amount).subscribe({
           next: () => {
             this.successMessage = 'Depósito realizado com sucesso!';
             this.transactionForm.reset();
@@ -73,8 +74,8 @@ export class TransactionFormComponent implements OnInit {
         });
         break;
 
-      case 'withdraw':
-        this.transactionService.withdraw(amount).subscribe({
+      case 'withdrawal':
+        this.accountService.withdraw(amount).subscribe({
           next: () => {
             this.successMessage = 'Saque realizado com sucesso!';
             this.transactionForm.reset();
@@ -88,20 +89,21 @@ export class TransactionFormComponent implements OnInit {
         break;
 
       case 'transfer':
-        const destAgency = this.transactionForm.value.destinationAgency;
-        const destAccount = this.transactionForm.value.destinationAccount;
-        this.transactionService.transfer(destAgency, destAccount, amount).subscribe({
-          next: () => {
-            this.successMessage = 'Transferência realizada com sucesso!';
-            this.transactionForm.reset();
-            this.submitting = false;
-          },
-          error: (err: { error: { message: string; }; }) => {
-            this.errorMessage = err.error?.message || 'Erro na transferência.';
-            this.submitting = false;
-          }
-        });
-        break;
+      const targetAgency = this.transactionForm.value.destinationAgency;
+      const targetAccountNumber = this.transactionForm.value.destinationAccount;
+      this.accountService.transfer(targetAgency, targetAccountNumber, amount).subscribe({
+        next: () => {
+          this.successMessage = 'Transferência realizada com sucesso!';
+          this.transactionForm.reset();
+          this.submitting = false;
+        },
+        error: (err: { error: { message: string } }) => {
+          this.errorMessage = err.error?.message || 'Erro na transferência.';
+          this.submitting = false;
+        }
+      });
+      break;
+
     }
   }
 }

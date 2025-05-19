@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TransactionService } from '../../services/transaction.service';
+import { Transaction, TransactionService } from '../../services/transaction.service';
 import { RouterModule } from '@angular/router';
+import { AccountService } from '../../services/account.service';
 
 interface Movement {
   id: number;
@@ -28,7 +29,7 @@ export class DashboardComponent implements OnInit {
 
   recentMovements: Movement[] = [];
 
-  constructor(private transactionService: TransactionService) {}
+  constructor(private accountService: AccountService,  private transactionService: TransactionService) {}
 
   ngOnInit(): void {
     this.loadAccountInfo();
@@ -36,7 +37,7 @@ export class DashboardComponent implements OnInit {
   }
 
     loadAccountInfo() {
-      this.transactionService.getAccount().subscribe({
+      this.accountService.getAccount().subscribe({
         next: (accountData) => {
           const user = JSON.parse(localStorage.getItem('user') || '{}');
           this.account.fullName = user.fullName || '';
@@ -54,23 +55,38 @@ export class DashboardComponent implements OnInit {
       });
     }
 
-  loadRecentMovements() {
-    this.transactionService.getTransactions().subscribe(transactions => {
-      this.recentMovements = transactions.map(transaction => ({
-        id: Number(transaction.id),
-        type: this.mapTransactionType(transaction.type),
-        amount: transaction.amount,
-        date: transaction.date,
-        description: transaction.description
-      }));
+  loadRecentMovements(startDate?: string, endDate?: string) {
+  if (startDate && endDate) {
+    this.transactionService.getTransactionsByPeriod(startDate, endDate).subscribe(transactions => {
+      this.recentMovements = this.mapTransactions(transactions);
+    });
+  } else {
+    this.transactionService.getAllTransactions().subscribe(transactions => {
+      this.recentMovements = this.mapTransactions(transactions);
     });
   }
+}
+
+/**
+ * Mapeia as transações para o formato esperado no frontend.
+ */
+private mapTransactions(transactions: Transaction[]): any[] {
+  return transactions.map(transaction => ({
+    id: Number(transaction.id),
+    type: this.mapTransactionType(transaction.type),
+    amount: transaction.amount,
+    date: transaction.createdAt,
+
+    description: transaction.description
+  }));
+}
+
 
   private mapTransactionType(type: string): 'Depósito' | 'Saque' | 'Transferência' {
     switch (type) {
       case 'deposit':
         return 'Depósito';
-      case 'withdraw':
+      case 'withdrawal':
         return 'Saque';
       case 'transfer':
         return 'Transferência';

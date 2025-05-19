@@ -4,9 +4,9 @@ import { Observable } from 'rxjs';
 
 export interface Transaction {
   id: string;
-  type: 'deposit' | 'withdraw' | 'transfer';
+  type: 'deposit' | 'withdrawal' | 'transfer';
   amount: number;
-  date: string;
+  createdAt: string;
   description?: string;
   fromAccount?: string;
   toAccount?: string;
@@ -16,31 +16,23 @@ export interface Transaction {
   providedIn: 'root'
 })
 export class TransactionService {
-  private baseUrl = 'http://localhost:3000/account'; // Ajuste para sua API
+  private baseUrl = 'http://localhost:3000/transactions';
 
   constructor(private http: HttpClient) {}
 
-  deposit(amount: number): Observable<any> {
-    return this.http.post(`${this.baseUrl}/deposit`, { amount });
+  /**
+   * Obtém todas as transações
+   */
+  getAllTransactions(): Observable<Transaction[]> {
+    return this.http.get<Transaction[]>(this.baseUrl);
   }
 
-  withdraw(amount: number): Observable<any> {
-    return this.http.post(`${this.baseUrl}/withdraw`, { amount });
+  /**
+   * Obtém transações por período
+   * Envia os dados como body JSON
+   */
+  getTransactionsByPeriod(startDate: string, endDate: string): Observable<Transaction[]> {
+    const payload = { startDate, endDate };
+    return this.http.post<Transaction[]>(`${this.baseUrl}/period`, payload);
   }
-
-  transfer(toAgency: string, toAccount: string, amount: number): Observable<any> {
-    return this.http.post(`${this.baseUrl}/transfer`, { toAgency, toAccount, amount });
-  }
-
-  getTransactions(startDate?: string, endDate?: string): Observable<Transaction[]> {
-    let params: any = {};
-    if (startDate) params.startDate = startDate;
-    if (endDate) params.endDate = endDate;
-    return this.http.get<Transaction[]>(this.baseUrl, { params });
-  }
-
-  getAccount(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/me`);
-  }
-
 }

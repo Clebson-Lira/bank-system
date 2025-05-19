@@ -6,9 +6,9 @@ import { RouterModule } from '@angular/router';
 
 interface Transaction {
   id: string;
-  type: 'deposit' | 'withdraw' | 'transfer';
+  type: 'deposit' | 'withdrawal' | 'transfer';
   amount: number;
-  date: string; // ISO string
+  createdAt: string; // ISO string
   description?: string;
   fromAccount?: string;
   toAccount?: string;
@@ -43,7 +43,7 @@ export class TransactionListComponent implements OnInit {
     this.loading = true;
     this.errorMessage = null;
 
-    this.transactionService.getTransactions().subscribe({
+    this.transactionService.getAllTransactions().subscribe({
       next: (txs: Transaction[]) => {
         this.transactions = txs;
         this.applyFilter();
@@ -60,7 +60,7 @@ export class TransactionListComponent implements OnInit {
     const { startDate, endDate } = this.filterForm.value;
 
     this.filteredTransactions = this.transactions.filter(tx => {
-      const txDate = new Date(tx.date);
+      const txDate = new Date(tx.createdAt);
 
       if (startDate) {
         const start = new Date(startDate);
