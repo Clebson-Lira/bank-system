@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { UserService } from '../../services/user.service';
 
 
 
@@ -19,7 +20,7 @@ export class HeaderComponent implements OnInit {
   userPhotoUrl: string | null = null;
    private routerSub!: Subscription;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router, private userService: UserService) {}
 
  ngOnInit(): void {
     this.loadUserInfo();
@@ -36,20 +37,21 @@ export class HeaderComponent implements OnInit {
     }
   }
 
-  // loadUserInfo() {
-  //   const user = this.authService.getCurrentUser(); // método que retorna dados do usuário logado
-  //   if(user) {
-  //     this.userName = user.fullName;
-  //     this.userPhotoUrl = user.photoUrl || null;
-  //   }
-  // }
   loadUserInfo() {
-  const user = this.authService.getUser(); // Corrija para getUser()
-  if(user) {
-    this.userName = user.fullName;
-    this.userPhotoUrl = user.photoUrl || null;
+    const user = this.authService.getUser();
+    this.userName = user ? user.fullName : '';
+
+    this.userService.getProfile().subscribe(profile => {
+      // Se profile.profilePicture for só o nome do arquivo, monte a URL:
+      if (profile.profilePicture) {
+        this.userPhotoUrl = profile.profilePicture.startsWith('http')
+          ? profile.profilePicture
+          : `http://localhost:3000/${profile.profilePicture}`;
+      } else {
+        this.userPhotoUrl = null;
+      }
+    });
   }
-}
 
   logout() {
     this.authService.logout();

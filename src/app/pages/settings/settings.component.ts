@@ -8,8 +8,8 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
-  standalone: true, // Adicione se não estiver
-  imports: [CommonModule, ReactiveFormsModule, RouterModule], // Adicione ReactiveFormsModule aqui
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent implements OnInit {
@@ -46,7 +46,6 @@ export class SettingsComponent implements OnInit {
     if(event.target.files && event.target.files.length) {
       this.selectedFile = event.target.files[0];
 
-      // Preview da imagem
       const reader = new FileReader();
       reader.onload = e => this.currentImageUrl = reader.result as string;
       reader.readAsDataURL(this.selectedFile as Blob);
@@ -58,43 +57,30 @@ export class SettingsComponent implements OnInit {
     const confirmPass = this.profileForm.get('confirmNewPassword')?.value;
     this.passwordMismatch = newPass !== confirmPass;
   }
-    onSubmit() {
-    if (this.profileForm.invalid || this.passwordMismatch) return;
+    async onSubmit() {
+  if (this.profileForm.invalid || this.passwordMismatch) return;
 
-    const { fullName, email } = this.profileForm.value;
-    let photoUrl = this.currentImageUrl;
+  const { fullName, email, currentPassword, newPassword } = this.profileForm.value;
+  const updateData: any = { fullName, email };
 
-    // Atualiza o usuário no localStorage
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    user.fullName = fullName;
-    user.email = email;
-    if (photoUrl) user.photoUrl = photoUrl;
-    localStorage.setItem('user', JSON.stringify(user));
+  try {
+    if (this.selectedFile) {
+      await this.userService.uploadPhoto(this.selectedFile).toPromise();
+    }
+
+    if (newPassword && currentPassword) {
+      await this.userService.updatePassword(currentPassword, newPassword).toPromise();
+    }
+
+    await this.userService.updateProfile(updateData, this.selectedFile ?? undefined).toPromise();
 
     alert('Perfil atualizado com sucesso!');
-
-    // Opcional: recarregar a página ou emitir evento para atualizar o header imediatamente
-    location.reload();
-     this.router.navigate(['/dashboard']);
+    this.router.navigate(['/dashboard']);
+    } catch (err: any) {
+      alert('Erro ao atualizar perfil: ' + (err?.message || err));
+    }
   }
-  cancel() {
+   cancel() {
     this.router.navigate(['/dashboard']);
   }
-
-  // onSubmit() {
-  //   if (this.profileForm.invalid || this.passwordMismatch) return;
-
-  //   const { fullName, email, currentPassword, newPassword } = this.profileForm.value;
-  //   const updateData: any = { fullName, email };
-
-  //   if (newPassword) {
-  //     updateData.currentPassword = currentPassword;
-  //     updateData.newPassword = newPassword;
-  //   }
-
-  //   this.userService.updateProfile(updateData, this.selectedFile).subscribe({
-  //     next: () => alert('Perfil atualizado com sucesso!'),
-  //     error: (err) => alert('Erro ao atualizar perfil: ' + err.message)
-  //   });
-  // }
 }

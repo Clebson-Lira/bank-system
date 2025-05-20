@@ -12,26 +12,37 @@ export interface UserProfileUpdate {
   providedIn: 'root'
 })
 export class UserService {
-  getProfile(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/profile`);
-  }
-  private baseUrl = 'http://localhost:3000/api/user';
+  private baseUrl = 'http://localhost:3000/profile';
 
   constructor(private http: HttpClient) {}
 
-  updateProfile(data: UserProfileUpdate, selectedFile: File | null): Observable<any> {
-    return this.http.put(`${this.baseUrl}/profile`, data);
+  getProfile(): Observable<any> {
+    return this.http.get(`${this.baseUrl}`);
+  }
+
+  updateProfile(data: UserProfileUpdate, file?: File): Observable<any> {
+    const formData = new FormData();
+    if (data.fullName) formData.append('fullName', data.fullName);
+    if (data.email) formData.append('email', data.email);
+    if (data.birthDate) formData.append('birthDate', data.birthDate);
+    if (file) formData.append('profilePicture', file);
+
+    return this.http.put(`${this.baseUrl}/update`, formData);
   }
 
   uploadPhoto(file: File): Observable<HttpEvent<any>> {
     const formData = new FormData();
-    formData.append('photo', file);
+    formData.append('profilePicture', file);
 
-    const req = new HttpRequest('POST', `${this.baseUrl}/upload-photo`, formData, {
+    const req = new HttpRequest('POST', `${this.baseUrl}/upload-picture`, formData, {
       reportProgress: true,
       responseType: 'json'
     });
 
     return this.http.request(req);
+  }
+
+  updatePassword(currentPassword: string, newPassword: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/update-password`, { currentPassword, newPassword });
   }
 }

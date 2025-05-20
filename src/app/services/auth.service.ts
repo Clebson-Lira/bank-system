@@ -27,7 +27,7 @@ interface RegisterData {
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:3000/auth'; // Ajuste para sua API
+  private baseUrl = 'http://localhost:3000/auth';
 
   constructor(private http: HttpClient) {}
 
@@ -51,9 +51,6 @@ export class AuthService {
     localStorage.removeItem('user');
   }
 
-  // isLoggedIn(): boolean {
-  //   return !!localStorage.getItem('token');
-  // }
   isLoggedIn(): boolean {
   return !!localStorage.getItem('user');
 }

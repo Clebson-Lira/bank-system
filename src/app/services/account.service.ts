@@ -17,7 +17,7 @@ export interface Transaction {
 })
 export class AccountService {
 
-private baseUrl = 'http://localhost:3000/account'; // Ajuste para sua API
+private baseUrl = 'http://localhost:3000/account';
 
   constructor(private http: HttpClient) {}
 
