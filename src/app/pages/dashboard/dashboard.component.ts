@@ -70,15 +70,17 @@ export class DashboardComponent implements OnInit {
 /**
  * Mapeia as transações para o formato esperado no frontend.
  */
-private mapTransactions(transactions: Transaction[]): any[] {
-  return transactions.map(transaction => ({
-    id: Number(transaction.id),
-    type: this.mapTransactionType(transaction.type),
-    amount: transaction.amount,
-    date: transaction.createdAt,
-
-    description: transaction.description
-  }));
+private mapTransactions(transactions: Transaction[]): Movement[] {
+  return transactions
+    .slice() // cria uma cópia para não alterar o array original
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .map(transaction => ({
+      id: Number(transaction.id),
+      type: this.mapTransactionType(transaction.type),
+      amount: transaction.amount,
+      date: transaction.createdAt,
+      description: transaction.description
+    }));
 }
 
 

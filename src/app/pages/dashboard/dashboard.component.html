@@ -31,9 +31,14 @@
           </thead>
           <tbody>
             <tr *ngFor="let mov of recentMovements">
-              <td>{{ mov.type }}</td>
-              <td>{{ mov.date | date:'dd/MM/yyyy HH:mm' }}</td>
               <td [ngClass]="{'deposit': mov.type === 'Depósito', 'withdrawal': mov.type === 'Saque', 'transfer': mov.type === 'Transferência'}">
+                {{ mov.type }}
+              </td>
+              <td>{{ mov.date | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td [ngClass]="{'deposit': mov.type === 'Depósito', 'withdrawal': mov.type === 'Saque', 'transfer': mov.type === 'Transferência'}" style="white-space: nowrap;">
+                <span style="display: inline-block; width: 2em; text-align: right;">
+                  {{ (mov.type === 'Saque' || mov.type === 'Transferência') ? '-' : '' }}
+                </span>
                 R$ {{ mov.amount | number:'1.2-2' }}
               </td>
               <td>{{ mov.description || '-' }}</td>
